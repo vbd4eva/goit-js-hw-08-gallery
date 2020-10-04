@@ -40,25 +40,18 @@ function onGalleryItemClick(e) {
 
   if (!e.target.classList.contains('gallery__image')) return;
 
-  // const currentImgObj = {
-  //   src: e.target.dataset.source,
-  //   alt: e.target.getAttribute('alt'),
-  // };
-
   setСurrentGalleryItemIndex(e.target.dataset.source);
 
   setLightBoxImg(currentGalleryItemIndex);
 
   openLightBox();
 
-  /* код НИЖЕ слушает вешает слушатели и закывает лайтбокс*/
   refs.lightBoxCloseButton.addEventListener('click', closingLightBox, {
     once: true,
   });
   refs.lightBoxOverlay.addEventListener('click', closingLightBox, {
     once: true,
   });
-  /* код ВЫШЕ слушает вешает слушатели и закывает лайтбокс*/
 
   window.addEventListener('keydown', reactionForKeypressOnOpenLightBox);
 }
