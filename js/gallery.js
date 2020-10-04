@@ -9,11 +9,15 @@ const refs = {
   lightBoxCloseButton: document.querySelector('[data-action="close-lightbox"]'),
 };
 
-const galleryItemsHtml = galleryItems.map(makeGalleryItemHtml).join('');
+refs.galleryContainer.innerHTML = makeGalleryItemsHtml(galleryItems);
 
-refs.galleryContainer.innerHTML = galleryItemsHtml;
+let currentGalleryItemIndex;
 
 refs.galleryContainer.addEventListener('click', onGalleryItemClick);
+
+function makeGalleryItemsHtml(galleryItems) {
+  return galleryItems.map(makeGalleryItemHtml).join('');
+}
 
 function makeGalleryItemHtml({ preview, original, description }) {
   return ` <li class="gallery__item">
@@ -34,27 +38,93 @@ function makeGalleryItemHtml({ preview, original, description }) {
 function onGalleryItemClick(e) {
   e.preventDefault();
 
-  const eTargetEl = e.target;
+  if (!e.target.classList.contains('gallery__image')) return;
 
-  if (!eTargetEl.classList.contains('gallery__image')) return;
+  // const currentImgObj = {
+  //   src: e.target.dataset.source,
+  //   alt: e.target.getAttribute('alt'),
+  // };
 
-  refs.lightBoxContainer.classList.add('is-open');
+  setСurrentGalleryItemIndex(e.target.dataset.source);
 
-  setLightBoxImg(eTargetEl);
+  setLightBoxImg(currentGalleryItemIndex);
 
+  openLightBox();
+
+  /* код НИЖЕ слушает вешает слушатели и закывает лайтбокс*/
   refs.lightBoxCloseButton.addEventListener('click', closingLightBox, {
     once: true,
   });
   refs.lightBoxOverlay.addEventListener('click', closingLightBox, {
     once: true,
   });
+  /* код ВЫШЕ слушает вешает слушатели и закывает лайтбокс*/
+
+  window.addEventListener('keydown', reactionForKeypressOnOpenLightBox);
 }
 
-function setLightBoxImg(eTargetEl) {
-  refs.lightBoxImg.setAttribute('src', eTargetEl.dataset.source);
-  refs.lightBoxImg.setAttribute('alt', eTargetEl.getAttribute('alt'));
+function setLightBoxImg(currentGalleryItemIndex) {
+  const currentGalleryItem = galleryItems[currentGalleryItemIndex];
+
+  refs.lightBoxImg.setAttribute('src', currentGalleryItem.original);
+  refs.lightBoxImg.setAttribute('alt', currentGalleryItem.description);
 }
 
-function closingLightBox(e) {
+function unsetLightBoxImg() {
+  refs.lightBoxImg.setAttribute('src', '');
+  refs.lightBoxImg.setAttribute('alt', '');
+}
+
+function openLightBox() {
+  refs.lightBoxContainer.classList.add('is-open');
+  document.body.classList.add('scroll-y-off');
+}
+
+function closingLightBox() {
+  window.removeEventListener('keydown', reactionForKeypressOnOpenLightBox);
+  document.body.classList.remove('scroll-y-off');
   refs.lightBoxContainer.classList.remove('is-open');
+  unsetLightBoxImg();
+}
+
+function setСurrentGalleryItemIndex(galleryItemsOriginal) {
+  // currentGalleryItem = galleryItemsOriginal;
+  const currentGalleryItem = galleryItems.find(
+    galleryItem => galleryItem.original === galleryItemsOriginal,
+  );
+  currentGalleryItemIndex = galleryItems.indexOf(currentGalleryItem);
+}
+
+function reactionForKeypressOnOpenLightBox(e) {
+  switch (e.code) {
+    case 'Escape':
+      closingLightBox();
+      break;
+
+    case 'ArrowLeft':
+      showPreviousImg();
+      break;
+
+    case 'ArrowRight':
+      showNextImg();
+      break;
+  }
+}
+
+function showPreviousImg() {
+  currentGalleryItemIndex =
+    currentGalleryItemIndex === 0
+      ? galleryItems.length - 1
+      : currentGalleryItemIndex - 1;
+
+  setLightBoxImg(currentGalleryItemIndex);
+}
+
+function showNextImg() {
+  currentGalleryItemIndex =
+    currentGalleryItemIndex === galleryItems.length - 1
+      ? 0
+      : (currentGalleryItemIndex += 1);
+
+  setLightBoxImg(currentGalleryItemIndex);
 }
