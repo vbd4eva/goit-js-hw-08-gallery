@@ -40,7 +40,7 @@ function onGalleryItemClick(e) {
 
   if (!e.target.classList.contains('gallery__image')) return;
 
-  setСurrentGalleryItemIndex(e.target.dataset.source);
+  setCurrentGalleryItemIndex(e.target.dataset.source);
 
   setLightBoxImg(currentGalleryItemIndex);
 
@@ -80,7 +80,7 @@ function closingLightBox() {
   unsetLightBoxImg();
 }
 
-function setСurrentGalleryItemIndex(galleryItemsOriginal) {
+function setCurrentGalleryItemIndex(galleryItemsOriginal) {
   // currentGalleryItem = galleryItemsOriginal;
   const currentGalleryItem = galleryItems.find(
     galleryItem => galleryItem.original === galleryItemsOriginal,
